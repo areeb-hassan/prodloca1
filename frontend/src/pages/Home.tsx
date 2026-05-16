@@ -17,7 +17,7 @@ function Home() {
                 <div style={{ borderRadius: '12px', overflow: 'hidden', backdropFilter: 'blur(10px)', background: 'rgba(0,0,0,0.4)' }}>
                     <iframe
                         width="100%"
-                        height="300"
+                        height="166"
                         scrolling="no"
                         frameBorder="no"
                         allow="autoplay"
