@@ -1,29 +1,27 @@
 import bg from '../media/homebg.jpeg'
+import SoundCloudPlayer from '../components/SoundCloudPlayer'
+
 function Home() {
     return (
-        <div style={{ height: '100vh', width: '100%', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ minHeight: '100vh', width: '100%', position: 'relative' }}>
             <img src={bg} alt="" className="home-bg-blur" />
             <img src={bg} alt="" className="home-bg" />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-4 z-10">
+            <div className="fixed inset-0 bg-black/50" />
+
+            <div className="relative z-10 flex flex-col items-center gap-6 pt-48 pb-24 px-6">
                 <a
                     href="https://soundcloud.com/prodloca1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-center text-white/70 hover:text-white text-lg font-large mb-3 transition-colors duration-200"
+                    className="block text-center text-white/70 hover:text-white text-lg transition-colors duration-200"
                 >
                     LOCAL
                 </a>
-                <div style={{ borderRadius: '12px', overflow: 'hidden', backdropFilter: 'blur(10px)', background: 'rgba(0,0,0,0.4)' }}>
-                    <iframe
-                        width="100%"
-                        height="166"
-                        scrolling="no"
-                        frameBorder="no"
-                        allow="autoplay"
-                        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/151-fussy&color=%23ffffff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true"
-                    />
-                </div>
+                <p className="w-full text-center text-white/50 text-xs tracking-[0.35em] uppercase">
+                    Music Producer & Mix Engineer | Ambient, Trap, Jungle + more
+                </p>
+                <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/151-fussy&auto_play=false&hide_related=true&show_comments=false" />
+                <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/why-did-i-delete-this&auto_play=false&hide_related=true&show_comments=false" />
             </div>
         </div>
     )
