@@ -11,6 +11,7 @@ function Gallery() {
     const [tab, setTab] = useState<'images' | 'videos'>('images')
     const [images, setImages] = useState<CloudinaryImage[]>([])
     const [loading, setLoading] = useState(true)
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/files`)
@@ -19,6 +20,23 @@ function Gallery() {
             .catch(console.error)
             .finally(() => setLoading(false))
     }, [])
+
+    const navigate = (dir: 1 | -1) => {
+        setSelectedIndex(i => i !== null ? (i + dir + images.length) % images.length : null)
+    }
+
+    useEffect(() => {
+        if (selectedIndex === null) return
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowLeft') navigate(-1)
+            if (e.key === 'ArrowRight') navigate(1)
+            if (e.key === 'Escape') setSelectedIndex(null)
+        }
+        window.addEventListener('keydown', handler)
+        return () => window.removeEventListener('keydown', handler)
+    }, [selectedIndex])
+
+    const selected = selectedIndex !== null ? images[selectedIndex] : null
 
     return (
         <div style={{ minHeight: '100vh', width: '100%', position: 'relative' }}>
@@ -49,21 +67,51 @@ function Gallery() {
                             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                         />
                     ))}
-                    {tab === 'images' && !loading && images.map(img => (
+                    {tab === 'images' && !loading && images.map((img, i) => (
                         <div
                             key={img.public_id}
-                            className="aspect-square rounded-lg overflow-hidden"
+                            className="aspect-square rounded-lg overflow-hidden cursor-pointer"
                             style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+                            onClick={() => setSelectedIndex(i)}
                         >
                             <img
                                 src={img.secure_url}
                                 alt={img.display_name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             />
                         </div>
                     ))}
                 </div>
             </div>
+
+            {selected && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+                    onClick={() => setSelectedIndex(null)}
+                >
+                    <div className="relative flex items-center" onClick={e => e.stopPropagation()}>
+                        <button
+                            className="absolute -left-10 text-white/50 hover:text-white text-4xl transition-colors"
+                            onClick={() => navigate(-1)}
+                        >
+                            ‹
+                        </button>
+
+                        <img
+                            src={selected.secure_url}
+                            alt={selected.display_name}
+                            className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
+                        />
+
+                        <button
+                            className="absolute -right-10 text-white/50 hover:text-white text-4xl transition-colors"
+                            onClick={() => navigate(1)}
+                        >
+                            ›
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
