@@ -70,8 +70,8 @@ function Gallery() {
                     {tab === 'images' && !loading && images.map((img, i) => (
                         <div
                             key={img.public_id}
-                            className="aspect-square rounded-lg overflow-hidden cursor-pointer"
-                            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+                            className="gallery-item aspect-square rounded-lg overflow-hidden cursor-pointer"
+                            style={{ border: '1px solid rgba(255,255,255,0.07)', animationDelay: `${i * 0.20}s` }}
                             onClick={() => setSelectedIndex(i)}
                         >
                             <img
@@ -100,7 +100,7 @@ function Gallery() {
                         <img
                             src={selected.secure_url}
                             alt={selected.display_name}
-                            className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
+                            className="lightbox-image max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
                         />
 
                         <button
