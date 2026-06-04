@@ -20,8 +20,12 @@ function Home() {
                 <p className="w-full text-center text-white/50 text-xs tracking-[0.35em] uppercase">
                     Music Producer & Mix Engineer | Ambient, Trap, Jungle + more
                 </p>
-                <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/151-fussy&auto_play=false&hide_related=true&show_comments=false" />
-                <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/why-did-i-delete-this&auto_play=false&hide_related=true&show_comments=false" />
+                <div className="grid grid-cols-2 gap-6 w-full max-w-2xl">
+                    <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/151-fussy&auto_play=false&hide_related=true&show_comments=false" />
+                    <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/why-did-i-delete-this&auto_play=false&hide_related=true&show_comments=false" />
+                    <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/birdsong&auto_play=false&hide_related=true&show_comments=false" />
+                    <SoundCloudPlayer src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/prodloca1/140str8todvd-mp3&auto_play=false&hide_related=true&show_comments=false" />
+                </div>
             </div>
         </div>
     )

@@ -8,6 +8,7 @@ interface SCSound {
   title: string
   artwork_url: string | null
   duration: number
+  permalink_url: string
 }
 
 function fmt(ms: number) {
@@ -22,6 +23,7 @@ export default function SoundCloudPlayer({ src }: { src: string }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [position, setPosition] = useState(0)
   const [ready, setReady] = useState(false)
+  const [seeking, setSeeking] = useState(false)
 
   useEffect(() => {
     const existing = document.querySelector('script[src="https://w.soundcloud.com/player/api.js"]')
@@ -48,6 +50,7 @@ export default function SoundCloudPlayer({ src }: { src: string }) {
 
       widget.bind(window.SC.Widget.Events.PLAY_PROGRESS, (e: { currentPosition: number }) => {
         setPosition(e.currentPosition)
+        setSeeking(false)
       })
     }
 
@@ -55,12 +58,15 @@ export default function SoundCloudPlayer({ src }: { src: string }) {
       ;(script as HTMLScriptElement).src = 'https://w.soundcloud.com/player/api.js'
       ;(script as HTMLScriptElement).onload = init
       document.head.appendChild(script)
-    } else {
+    } else if (window.SC) {
       init()
+    } else {
+      existing.addEventListener('load', init)
     }
 
     return () => {
       if (!existing && script.parentNode) document.head.removeChild(script)
+      existing?.removeEventListener('load', init)
     }
   }, [])
 
@@ -94,7 +100,7 @@ export default function SoundCloudPlayer({ src }: { src: string }) {
                 <div className="w-14 h-14 rounded-xl shrink-0" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate leading-snug">{track?.title ?? '—'}</p>
+                <a href={track?.permalink_url} target="_blank" rel="noopener noreferrer" className="text-white text-sm font-medium truncate leading-snug hover:underline">{track?.title ?? '—'}</a>
                 <p className="text-white/25 text-[10px] tracking-[0.35em] uppercase mt-1">LOCAL</p>
               </div>
             </div>
@@ -107,12 +113,13 @@ export default function SoundCloudPlayer({ src }: { src: string }) {
                   const rect = e.currentTarget.getBoundingClientRect()
                   const ratio = (e.clientX - rect.left) / rect.width
                   const seekTo = Math.floor(ratio * duration)
+                  setSeeking(true)
                   widgetRef.current?.seekTo(seekTo)
                   setPosition(seekTo)
                 }}
               >
                 <div className="w-full h-px relative" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <div className="h-px bg-white/50 transition-all duration-300" style={{ width: `${progress * 100}%` }} />
+                  <div className={`h-px bg-white/50 ${seeking ? '' : 'transition-all duration-300'}`} style={{ width: `${progress * 100}%` }} />
                 </div>
               </div>
               <span className="text-white/30 text-[10px] tabular-nums w-8 shrink-0 text-right">{fmt(duration)}</span>
