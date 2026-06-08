@@ -1,28 +1,36 @@
 import { useState, useEffect } from 'react'
 import bg from '../media/gallerybg.jpg'
 
-interface CloudinaryImage {
+interface CloudinaryAsset {
     public_id: string
     secure_url: string
-    display_name: string
+    display_name?: string
+    format: string
 }
 
 function Gallery() {
     const [tab, setTab] = useState<'images' | 'videos'>('images')
-    const [images, setImages] = useState<CloudinaryImage[]>([])
+    const [images, setImages] = useState<CloudinaryAsset[]>([])
+    const [videos, setVideos] = useState<CloudinaryAsset[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
+    const activeItems = tab === 'images' ? images : videos
+
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/files`)
+        setLoading(true)
+        fetch(`${import.meta.env.VITE_API_URL}/files?folder=${tab}`)
             .then(res => res.json())
-            .then(data => setImages(data))
+            .then(data => {
+                if (tab === 'images') setImages(data)
+                else setVideos(data)
+            })
             .catch(console.error)
             .finally(() => setLoading(false))
-    }, [])
+    }, [tab])
 
     const navigate = (dir: 1 | -1) => {
-        setSelectedIndex(i => i !== null ? (i + dir + images.length) % images.length : null)
+        setSelectedIndex(i => i !== null ? (i + dir + activeItems.length) % activeItems.length : null)
     }
 
     useEffect(() => {
@@ -34,9 +42,9 @@ function Gallery() {
         }
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
-    }, [selectedIndex])
+    }, [selectedIndex, tab])
 
-    const selected = selectedIndex !== null ? images[selectedIndex] : null
+    const selected = selectedIndex !== null ? activeItems[selectedIndex] : null
 
     return (
         <div style={{ minHeight: '100vh', width: '100%', position: 'relative' }}>
@@ -49,7 +57,7 @@ function Gallery() {
                     {(['images', 'videos'] as const).map(t => (
                         <button
                             key={t}
-                            onClick={() => setTab(t)}
+                            onClick={() => { setTab(t); setSelectedIndex(null) }}
                             className={`text-[10px] tracking-[0.4em] uppercase transition-colors duration-200 ${
                                 tab === t ? 'text-white' : 'text-white/25 hover:text-white/50'
                             }`}
@@ -60,14 +68,14 @@ function Gallery() {
                 </div>
 
                 <div className="grid grid-cols-4 gap-2 max-w-4xl mx-auto">
-                    {tab === 'images' && loading && Array(8).fill(null).map((_, i) => (
+                    {loading && Array(8).fill(null).map((_, i) => (
                         <div
                             key={i}
                             className="aspect-square rounded-lg animate-pulse"
                             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                         />
                     ))}
-                    {tab === 'images' && !loading && images.map((img, i) => (
+                    {!loading && tab === 'images' && images.map((img, i) => (
                         <div
                             key={img.public_id}
                             className="gallery-item aspect-square rounded-lg overflow-hidden cursor-pointer"
@@ -78,6 +86,25 @@ function Gallery() {
                                 src={img.secure_url}
                                 alt={img.display_name}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                    ))}
+                    {!loading && tab === 'videos' && videos.map((vid, i) => (
+                        <div
+                            key={vid.public_id}
+                            className="gallery-item aspect-square rounded-lg overflow-hidden cursor-pointer"
+                            style={{ border: '1px solid rgba(255,255,255,0.07)', animationDelay: `${i * 0.20}s` }}
+                            onClick={() => { console.log('clicked', i); setSelectedIndex(i) }}
+                            onMouseEnter={e => e.currentTarget.querySelector('video')?.play()}
+                            onMouseLeave={e => e.currentTarget.querySelector('video')?.pause()}
+                        >
+                            <video
+                                src={vid.secure_url}
+                                className="w-full h-full object-cover"
+                                style={{ pointerEvents: 'none' }}
+                                muted
+                                loop
+                                playsInline
                             />
                         </div>
                     ))}
@@ -97,11 +124,21 @@ function Gallery() {
                             ‹
                         </button>
 
-                        <img
-                            src={selected.secure_url}
-                            alt={selected.display_name}
-                            className="lightbox-image max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
-                        />
+                        {tab === 'images' ? (
+                            <img
+                                src={selected.secure_url}
+                                alt={selected.display_name}
+                                className="lightbox-image max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
+                            />
+                        ) : (
+                            <video
+                                key={selected.secure_url}
+                                src={selected.secure_url}
+                                className="lightbox-image max-h-[90vh] max-w-[90vw] rounded-lg"
+                                controls
+                                autoPlay
+                            />
+                        )}
 
                         <button
                             className="absolute -right-10 text-white/50 hover:text-white text-4xl transition-colors"

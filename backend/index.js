@@ -43,8 +43,11 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
 app.get('/files', async (req, res) => {
     try {
-        const result = await cloudinary.api.resources_by_asset_folder('images', {
-            max_results: 50
+        const folder = req.query.folder || 'images'
+        const result = await cloudinary.api.resources_by_asset_folder(folder, {
+            max_results: 50,
+            tags: true,
+            context: true
         })
         console.log(result)
         res.json(result.resources)
