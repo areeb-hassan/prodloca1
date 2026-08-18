@@ -4,8 +4,6 @@ const links = [
   { label: "Home", to: "/" },
   { label: "Gallery", to: "/Gallery" },
   { label: "Shop", to: "/shop" },
-  { label: "About", to: "/about" },
-  { label: "Contact", to: "/contact" },
 ]
 
 function Nav() {
